@@ -24,10 +24,6 @@ class RestaurantServiceTest {
     private RestaurantService restaurantService;
     @Mock
     private RestaurantRepository restaurantRepository;
-    @Mock
-    private MenuItemRepository menuItemRepository;
-    @Mock
-    private ReviewRepository reviewRepository;
 
     // 모든 테스트가 실행되기 전에 이것을 실행한다.
     @BeforeEach
@@ -35,10 +31,8 @@ class RestaurantServiceTest {
         MockitoAnnotations.initMocks(this);
 
         mockRestaurantRepository();
-        mockMenuItemRepository();
-        mockReviewRepository();
 
-        restaurantService = new RestaurantService(restaurantRepository, menuItemRepository, reviewRepository);
+        restaurantService = new RestaurantService(restaurantRepository);
     }
 
     private void mockRestaurantRepository() {
@@ -55,28 +49,6 @@ class RestaurantServiceTest {
         given(restaurantRepository.findById(1004L)).willReturn(java.util.Optional.of(restaurant));
     }
 
-    private void mockMenuItemRepository() {
-        List<MenuItem> menuItems = new ArrayList<>();
-        menuItems.add(MenuItem.builder()
-            .name("Kimchi")
-            .build());
-
-        given(menuItemRepository.findAllByRestaurantId(1004L))
-                .willReturn(menuItems);
-    }
-
-    private void mockReviewRepository() {
-        List<Review> reviews = new ArrayList<>();
-        reviews.add(Review.builder()
-                .name("BeRyong")
-                .score(1)
-                .description("Bad")
-                .build());
-
-        given(reviewRepository.findAllByRestaurantId(1004L))
-                .willReturn(reviews);
-    }
-
     @Test
     public void getRestaurants(){
         List<Restaurant> restaurants = restaurantService.getRestaurants();
@@ -87,16 +59,7 @@ class RestaurantServiceTest {
     public void getRestaurantWithExisted(){
         Restaurant restaurant = restaurantService.getRestaurant(1004L);
 
-        verify(menuItemRepository).findAllByRestaurantId(eq(1004L));
-        verify(reviewRepository).findAllByRestaurantId(eq(1004L));
-
         assertEquals(restaurant.getId(), 1004L);
-
-        MenuItem menuItem = restaurant.getMenuItems().get(0);
-        assertEquals(menuItem.getName(), "Kimchi");
-
-        Review review = restaurant.getReviews().get(0);
-        assertEquals(review.getDescription(), "Bad");
     }
     @Test
     public void getRestaurantWithNotExisted(){
