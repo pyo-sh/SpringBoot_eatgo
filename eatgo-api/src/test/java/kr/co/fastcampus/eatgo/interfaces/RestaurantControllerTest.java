@@ -11,6 +11,7 @@ import kr.co.fastcampus.eatgo.application.RestaurantService;
 import kr.co.fastcampus.eatgo.domain.MenuItem;
 import kr.co.fastcampus.eatgo.domain.Restaurant;
 import kr.co.fastcampus.eatgo.domain.RestaurantNotFoundException;
+import kr.co.fastcampus.eatgo.domain.Review;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,34 +55,30 @@ class RestaurantControllerTest {
 
     @Test
     public void detailWithExisted() throws Exception{
-        Restaurant restaurant1 = Restaurant.builder()
+        // 직접 만든 부분들을 확인 했지만 Spring data JPA 활용을 해서 실행하는 환경이 만들어져서 간편하게 만듬
+        Restaurant restaurant = Restaurant.builder()
                 .id(1004L)
                 .name("JOKER House")
                 .address("Seoul")
                 .build();
-        restaurant1.setMenuItems(Arrays.asList(MenuItem.builder()
+        restaurant.setMenuItems(Arrays.asList(MenuItem.builder()
                 .name("Kimchi")
                 .build()));
-
-        Restaurant restaurant2 = Restaurant.builder()
-                .id(2020L)
-                .name("Cyber Food")
-                .address("Seoul")
+        Review review = Review.builder()
+                .name("JOKER")
+                .score(5)
+                .description("Great!")
                 .build();
+        restaurant.setReviews(Arrays.asList(review));
 
-        given(restaurantService.getRestaurant(1004L)).willReturn(restaurant1);
-        given(restaurantService.getRestaurant(2020L)).willReturn(restaurant2);
+        given(restaurantService.getRestaurant(1004L)).willReturn(restaurant);
 
         mvc.perform(get("/restaurants/1004"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("\"id\":1004")))
                 .andExpect(content().string(containsString("\"name\":\"JOKER House\"")))
-                .andExpect(content().string(containsString("Kimchi")));
-
-        mvc.perform(get("/restaurants/2020"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(containsString("\"id\":2020")))
-                .andExpect(content().string(containsString("\"name\":\"Cyber Food\"")));
+                .andExpect(content().string(containsString("Kimchi")))
+                .andExpect(content().string(containsString("Great!")));
     }
     @Test
     public void detailWithNotExisted() throws Exception{
