@@ -8,10 +8,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import kr.co.fastcampus.eatgo.application.RestaurantService;
-import kr.co.fastcampus.eatgo.domain.MenuItem;
 import kr.co.fastcampus.eatgo.domain.Restaurant;
 import kr.co.fastcampus.eatgo.domain.RestaurantNotFoundException;
-import kr.co.fastcampus.eatgo.domain.Review;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @ExtendWith(SpringExtension.class)
@@ -41,6 +38,7 @@ class RestaurantControllerTest {
         List<Restaurant> restaurants = new ArrayList<>();
         restaurants.add(Restaurant.builder()
                 .id(1004L)
+                .categoryId(1L)
                 .name("JOKER House")
                 .address("Seoul")
                 .build());
@@ -58,6 +56,7 @@ class RestaurantControllerTest {
         // 직접 만든 부분들을 확인 했지만 Spring data JPA 활용을 해서 실행하는 환경이 만들어져서 간편하게 만듬
         Restaurant restaurant = Restaurant.builder()
                 .id(1004L)
+                .categoryId(1L)
                 .name("JOKER House")
                 .address("Seoul")
                 .build();
@@ -84,6 +83,7 @@ class RestaurantControllerTest {
             Restaurant restaurant = invocation.getArgument(0);
             return Restaurant.builder()
                     .id(1234L)
+                    .categoryId(1L)
                     .name(restaurant.getName())
                     .address(restaurant.getAddress())
                     .build();
@@ -91,7 +91,7 @@ class RestaurantControllerTest {
 
         mvc.perform(post("/restaurants")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\": \"BeRyong\", \"address\": \"Busan\"}"))
+                .content("{\"categoryId\" : 1, \"name\": \"BeRyong\", \"address\": \"Busan\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("location", "/restaurants/1234"))
                 .andExpect(content().string("{}"));
@@ -102,7 +102,7 @@ class RestaurantControllerTest {
     public void createWithInvalidData() throws Exception {
         mvc.perform(post("/restaurants")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\": \"\", \"address\": \"\"}"))
+                .content("{\"categoryId\" : , \"name\": \"\", \"address\": \"\"}"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -110,7 +110,7 @@ class RestaurantControllerTest {
     public void updateWithValidData() throws Exception {
         mvc.perform(patch("/restaurants/1004")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\": \"JOKER Bar\", \"address\": \"Busan\"}"))
+                .content("{\"categoryId\" : 1, \"name\": \"JOKER Bar\", \"address\": \"Busan\"}"))
                 .andExpect(status().isOk());
 
         verify(restaurantService).updateRestaurant(1004L, "JOKER Bar", "Busan");
@@ -119,7 +119,7 @@ class RestaurantControllerTest {
     public void updateWithInvalidData() throws Exception {
         mvc.perform(patch("/restaurants/1004")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\": \"\", \"address\": \"\"}"))
+                .content("{\"categoryId\" : , \"name\": \"\", \"address\": \"\"}"))
                 .andExpect(status().isBadRequest());
     }
 }
