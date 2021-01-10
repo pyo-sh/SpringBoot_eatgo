@@ -44,13 +44,4 @@ public class User {
     public void deactivate() {
         level = 0L;
     }
-
-    // 실제에선 이렇게 안하는 것 같다... 알아보자
-    @JsonIgnore
-    public String getAccessToken() {
-        if(password == null){
-            return "";
-        }
-        return password.substring(0, 11);
-    }
 }
