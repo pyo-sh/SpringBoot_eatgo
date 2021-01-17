@@ -46,9 +46,6 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
         Claims claims = jwtUtil.getClaims(token.substring("Bearer ".length()));
 
-        // 세세하게 하려면 직접 상속을 받아서 class 만든 뒤 사용할 수도 있다.
-        Authentication authentication =
-                new UsernamePasswordAuthenticationToken(claims, null);
-        return authentication;
+        return new UsernamePasswordAuthenticationToken(claims, null);
     }
 }

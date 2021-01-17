@@ -36,8 +36,7 @@ class ReservationServiceTests {
         Integer partySize = 20;
 
         given(reservationRepository.save(any())).will(invocation -> {
-            Reservation reservation = invocation.getArgument(0);
-            return reservation;
+            return invocation.getArgument(0);
         });
 
         Reservation reservation = reservationService.addReservation(restaurantId, userId, name, date, time, partySize);
