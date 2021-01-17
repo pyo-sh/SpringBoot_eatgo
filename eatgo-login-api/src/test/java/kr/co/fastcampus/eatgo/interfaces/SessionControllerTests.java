@@ -43,11 +43,42 @@ class SessionControllerTests {
         User mockUser = User.builder()
                 .Id(id)
                 .name(name)
+                .level(1L)
                 .build();
 
         given(userService.authenticate(email, password)).willReturn(mockUser);
 
-        given(jwtUtil.createToken(id, name)).willReturn("header.payload.signature");
+        given(jwtUtil.createToken(id, name, null)).willReturn("header.payload.signature");
+
+        mvc.perform(post("/session")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\" : \"tester@example.com\", \"password\" : \"test\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("location", "/session"))
+                // 실제 서비스에선 이러지 마세요... 암호화된 패스워드를 사용...?
+                .andExpect(content().string(containsString("{\"accessToken\":\"header.payload.signature\"}")))
+                .andExpect(content().string(containsString(".")));
+
+        verify(userService).authenticate(eq(email), eq(password));
+    }
+
+    @Test
+    public void createRestaurantOwner() throws Exception{
+        long id = 1004L;
+        String name = "Tester";
+        String email = "tester@example.com";
+        String password = "test";
+
+        User mockUser = User.builder()
+                .Id(id)
+                .name(name)
+                .level(50L)
+                .restaurantId(369L)
+                .build();
+
+        given(userService.authenticate(email, password)).willReturn(mockUser);
+
+        given(jwtUtil.createToken(id, name, 369L)).willReturn("header.payload.signature");
 
         mvc.perform(post("/session")
                 .contentType(MediaType.APPLICATION_JSON)
