@@ -38,3 +38,9 @@ out/
 
 ### Node JS ###
 /eatgo-web/node_modules
+
+### .env
+/.env
+
+### data
+/data
